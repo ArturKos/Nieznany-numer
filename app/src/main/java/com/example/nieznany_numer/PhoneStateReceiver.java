@@ -15,7 +15,6 @@ public class PhoneStateReceiver extends BroadcastReceiver {
             String incomingNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
             if (state.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
                 MainActivity.setPhoneNumber(incomingNumber);
-                //MainActivity.getPhoneNumberInfo(incomingNumber);
             }
         } catch (Exception e) {
             e.printStackTrace();

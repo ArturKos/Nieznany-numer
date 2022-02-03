@@ -18,6 +18,7 @@ import java.io.IOException;
 public class MainActivity extends AppCompatActivity {
 
     public static TextView result;
+    private static Object PhoneNumberProvider;
     private Object context;
     @Override
     protected void onStop(){
@@ -44,7 +45,9 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setAttributes(wlp);
     }
     public static void setPhoneNumber(String ph) {
-        //MainActivity.getPhoneNumberInfo(ph);
+        PhoneNumberProvider ph_Info = new PhoneNumberProvider();
+        String number_info = ph_Info.get_PhoneNumberInfo(" 815311029");
+        result.setText(number_info);
     }
 
 }

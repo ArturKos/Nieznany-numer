@@ -8,7 +8,13 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 
 public class PhoneNumberProvider {
-    public void getPhoneNumberInfo(String Phone_number) {
+    private static String PhoneNumberInfo;
+    public String get_PhoneNumberInfo(String Phone_number)
+    {
+        getPhoneNumberInfo(Phone_number);
+        return PhoneNumberInfo;
+    }
+    private void getPhoneNumberInfo(String Phone_number) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -28,14 +34,16 @@ public class PhoneNumberProvider {
                 } catch (IOException e) {
                     builder.append("Error : ").append(e.getMessage()).append("\n");
                 }
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        MainActivity.result.setText(builder.toString());
-                    }
-                });
+                PhoneNumberInfo = builder.toString();
+//                runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        MainActivity.result.setText(builder.toString());
+//                    }
+//                });
             }
         }).start();
     }
+
+    PhoneNumberProvider() {PhoneNumberInfo = "";}
 }
