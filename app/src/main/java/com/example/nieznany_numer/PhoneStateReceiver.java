@@ -2,17 +2,22 @@ package com.example.nieznany_numer;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.telephony.TelephonyManager;
-import android.widget.Toast;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 
 public class PhoneStateReceiver extends BroadcastReceiver {
+    String incomingNumber;
     @Override
     public void onReceive(Context context, Intent intent) {
         try {
             String state = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
-            String incomingNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
+            incomingNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
             if (state.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
                 MainActivity.setPhoneNumber(incomingNumber);
             }

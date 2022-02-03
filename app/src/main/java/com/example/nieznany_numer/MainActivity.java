@@ -1,40 +1,39 @@
 package com.example.nieznany_numer;
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.PixelFormat;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.TextView;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.jsoup.Jsoup;
+
 import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static TextView result;
-    private static Object PhoneNumberProvider;
-    private Object context;
+    private static TextView result;
+    private static PhoneNumberProvider ph_Info;
+
     @Override
-    protected void onStop(){
+    protected void onStop() {
         super.onStop();
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         result = (TextView) findViewById(R.id.result);
+        ph_Info = new PhoneNumberProvider();
         setWindowParams();
-
     }
+
     public void setWindowParams() {
         WindowManager.LayoutParams wlp = getWindow().getAttributes();
         wlp.dimAmount = 0;
@@ -44,10 +43,12 @@ public class MainActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
         getWindow().setAttributes(wlp);
     }
-    public static void setPhoneNumber(String ph) {
-        PhoneNumberProvider ph_Info = new PhoneNumberProvider();
-        String number_info = ph_Info.get_PhoneNumberInfo(" 815311029");
-        result.setText(number_info);
-    }
 
+    public static void setPhoneNumber(String ph) {
+        ph_Info.get_PhoneNumberInfo("694053003"); //do zmiany numer
+        result.setText("Proszę czekać, pobieram dane o numerze: "+ph);
+    }
+    public static void setTextViewText(String text) {
+        result.setText(text);
+    }
 }

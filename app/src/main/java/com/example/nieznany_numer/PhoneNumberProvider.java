@@ -4,16 +4,16 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
 import java.io.IOException;
+
 
 public class PhoneNumberProvider {
     private static String PhoneNumberInfo;
-    public String get_PhoneNumberInfo(String Phone_number)
-    {
+
+    public void get_PhoneNumberInfo(String Phone_number) {
         getPhoneNumberInfo(Phone_number);
-        return PhoneNumberInfo;
     }
+
     private void getPhoneNumberInfo(String Phone_number) {
         new Thread(new Runnable() {
             @Override
@@ -24,6 +24,7 @@ public class PhoneNumberProvider {
                     String url = "https://www.nieznany-numer.pl/Numer/" + Phone_number;
                     Document doc = Jsoup.connect(url).get();
                     Elements data_divs = doc.select("div.dataColumn");
+                    builder.append("\n").append("Dzwoni numer telefonu: " + Phone_number);
                     Integer index = 0;
                     String[] strings = {"Ocena: ", "Wyszukiwań: ", "Komentarzy: ", "Ostatnio sprawdzany: "};
 
@@ -35,15 +36,8 @@ public class PhoneNumberProvider {
                     builder.append("Error : ").append(e.getMessage()).append("\n");
                 }
                 PhoneNumberInfo = builder.toString();
-//                runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        MainActivity.result.setText(builder.toString());
-//                    }
-//                });
+                MainActivity.setTextViewText(PhoneNumberInfo);
             }
         }).start();
     }
-
-    PhoneNumberProvider() {PhoneNumberInfo = "";}
 }
