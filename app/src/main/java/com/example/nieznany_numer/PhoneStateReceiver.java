@@ -22,4 +22,3 @@ public class PhoneStateReceiver extends BroadcastReceiver {
         }
     }
 }
-ąą
