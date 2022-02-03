@@ -3,6 +3,6 @@ Aplikacja dla systemu Android sprawdzająca w czasie rzeczywistym numer dzwonią
 
 Na chwilę obecną w fazie wstępnych testów.
 
-![com example nieznany_numer1](https://user-images.githubusercontent.com/17749811/152437910-c51bf7e8-3d37-4909-8f7c-2ebf32a00549.jpg)
+![com example nieznany_numer1](https://user-images.githubusercontent.com/17749811/152438154-43c6c848-16ce-42d4-b670-bb1a7e698cc7.jpg)
 
-![com example nieznany_numer2](https://user-images.githubusercontent.com/17749811/152437943-0f16e916-7a18-4a04-a571-d44c76e4edb9.jpg)
+![com example nieznany_numer2](https://user-images.githubusercontent.com/17749811/152438173-5759df2b-bd1f-4c15-aead-47ab282ab81e.jpg)
