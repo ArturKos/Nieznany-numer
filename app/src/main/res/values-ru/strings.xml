@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Неизвестный номер</string>
+    <string name="hello_user">Доброе утро! Ожидание соединения :) Если телефон звонит, пожалуйста, подождите, пока загрузится информация о вызывающем номере.</string>
+    <string name="telephone_ringing">Номер телефона звонит:\u0020</string>
+    <string name="telephone_ocena">Рейтинг:\u0020</string>
+    <string name="telephone_searches">Поиски:\u0020</string>
+    <string name="telephone_comments">Комментарии:\u0020</string>
+    <string name="telephone_last_checked">Недавно проверено:\u0020</string>
+    <string name="please_wait_getting_data">Пожалуйста, подождите, я загружаю данные о номере:\u0020</string>
+    <string name="error_geting_pn_info">Ошибка при попытке получить информацию о номере:\u0020</string>
+</resources>

@@ -11,7 +11,7 @@
         android:id="@+id/result"
         android:layout_width="246dp"
         android:layout_height="206dp"
-        android:text="Dzień dobry! Oczekuję na połączenie :) \n Jeżeli telefon dzwoni proszę chwilę zaczekać na pobranie danych."
+        android:text="@string/hello_user"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.414"
         app:layout_constraintLeft_toLeftOf="parent"

@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Unknown-number</string>
+    <string name="hello_user">Good morning! Waiting for a connection :) If the phone is ringing, please wait a moment for the information about the calling number to be downloaded.</string>
+    <string name="telephone_ringing">The phone number is calling:\u0020</string>
+    <string name="telephone_ocena">Ocena:\u0020</string>
+    <string name="telephone_searches">Searches:\u0020</string>
+    <string name="telephone_comments">Comments:\u0020</string>
+    <string name="telephone_last_checked">Recently checked:\u0020</string>
+    <string name="please_wait_getting_data">Please wait, I am downloading data about the number:\u0020</string>
+    <string name="error_geting_pn_info">Error when trying to get information about the number:\u0020</string>
+</resources>

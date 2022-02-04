@@ -12,9 +12,9 @@ import org.jsoup.select.Elements;
 
 
 public class PhoneStateReceiver extends BroadcastReceiver {
-    String incomingNumber;
     @Override
     public void onReceive(Context context, Intent intent) {
+        String incomingNumber;
         try {
             String state = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
             incomingNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
