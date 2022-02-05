@@ -1,20 +1,28 @@
 package com.example.nieznany_numer;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
-    private static TextView result;
+    public static TextView result;
     private static PhoneNumberProvider ph_Info;
     public static Context context;
+    public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
 
     @Override
     protected void onStop() {
@@ -32,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
         ph_Info = new PhoneNumberProvider();
         setWindowParams();
         addNotification();
+        checkAndRequestPermissions();
     }
 
     public void setWindowParams() {
@@ -67,5 +76,34 @@ public class MainActivity extends AppCompatActivity {
         // Add as notification
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         manager.notify(0, builder.build());
+    }
+
+
+    private  boolean checkAndRequestPermissions() {
+        int phone_state_permission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
+        int internet_access_permission = ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET);
+        int system_alert_window_permission = ContextCompat.checkSelfPermission(this, Manifest.permission.SYSTEM_ALERT_WINDOW);
+        int read_call_log_permission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG);
+        List<String> listPermissionsNeeded = new ArrayList<>();
+
+        if (phone_state_permission != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(android.Manifest.permission.READ_PHONE_STATE);
+        }
+        if (internet_access_permission != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(android.Manifest.permission.INTERNET);
+        }
+        if (read_call_log_permission != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(android.Manifest.permission.READ_CALL_LOG);
+        }
+        if (system_alert_window_permission != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(android.Manifest.permission.SYSTEM_ALERT_WINDOW);
+        }
+        if (!listPermissionsNeeded.isEmpty())
+        {
+            ActivityCompat.requestPermissions(this,listPermissionsNeeded.toArray
+                    (new String[listPermissionsNeeded.size()]),REQUEST_ID_MULTIPLE_PERMISSIONS);
+            return false;
+        }
+        return true;
     }
 }

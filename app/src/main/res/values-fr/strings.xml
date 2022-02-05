@@ -7,5 +7,5 @@
     <string name="telephone_comments">Commentaires:\u0020</string>
     <string name="telephone_last_checked">Récemment vérifié:\u0020</string>
     <string name="please_wait_getting_data">Veuillez patienter, je télécharge des données sur le numéro:\u0020</string>
-    <string name="error_geting_pn_info">Erreur lors de la tentative d\'obtention d\' informations sur le numéro:\u0020</string>
+    <string name="error_geting_pn_info">Erreur lors de la tentative d\'obtention d\'informations sur le numéro:\u0020</string>
 </resources>
