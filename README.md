@@ -1,4 +1,4 @@
-# Nieznany numer
+# Unknown Number
 
 Nieznany numer is an Android application that checks the caller's number in real-time using the service at [nieznany-numer.pl](https://www.nieznany-numer.pl/). 
 
