@@ -3,7 +3,8 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        jcenter() // Warning: this repository is going to shut down soon
+        // jeżeli naprawdę potrzebujesz artefaktów z JCenter (niezalecane):
+        // maven { url "https://jcenter.bintray.com/" }
     }
 }
 rootProject.name = "Nieznany-numer"

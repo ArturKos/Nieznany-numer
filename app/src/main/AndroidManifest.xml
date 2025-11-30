@@ -16,9 +16,6 @@
         android:supportsRtl="true"
         android:visibility="visible"
         android:theme="@style/Theme.AppCompat.Dialog.Alert">
-        //android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-
-        //android:theme="@style/Theme.Nieznanynumer">
         <activity
             android:name=".MainActivity"
             android:exported="true">
