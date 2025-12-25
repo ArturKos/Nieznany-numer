@@ -1,54 +1,58 @@
 #!/usr/bin/env python3
 import subprocess
-import tempfile
 from pathlib import Path
 from datetime import date
+import tempfile
+import shlex
 
-# --- pomocnicze funkcje ---
-def sh(cmd, **kwargs):
-    """Uruchamia polecenie w shellu i wyrzuca wyjątek przy błędzie."""
-    subprocess.run(cmd, shell=True, check=True, **kwargs)
+# ---------- HELPER ----------
+def sh(cmd, check=True):
+    """Run shell command"""
+    print(f"> {cmd}")
+    subprocess.run(cmd, shell=True, check=check)
 
-def git_current_branch():
-    result = subprocess.run(
-        ["git", "rev-parse", "--abbrev-ref", "HEAD"],
-        capture_output=True, text=True, check=True
-    )
-    return result.stdout.strip()
-
-def get_todo_files():
-    """Zwraca listę plików, które zawierają TODO."""
-    result = subprocess.run(
-        ["git", "grep", "-l", "TODO"],
-        capture_output=True, text=True
-    )
-    files = result.stdout.strip().splitlines()
-    return [f for f in files if Path(f).is_file()]
-
-# --- główna logika ---
+# ---------- CONFIG ----------
+# Branch nazwa na podstawie daty
 BRANCH = f"ai/todo-cleanup/{date.today().isoformat()}"
-FILES = get_todo_files()
 
+# Root repo (aktualny katalog)
+ROOT = Path(__file__).parent.parent.resolve()
+
+# ---------- ZBIERANIE PLIKÓW Z TODO ----------
+def find_todo_files(root: Path):
+    todo_files = []
+    for f in root.rglob("*"):
+        if f.is_file() and f.suffix in [".java", ".kt", ".py"]:  # dodaj inne rozszerzenia jeśli trzeba
+            try:
+                if "TODO" in f.read_text(encoding="utf-8"):
+                    todo_files.append(f)
+            except Exception:
+                continue
+    return todo_files
+
+FILES = find_todo_files(ROOT)
 if not FILES:
-    print("Brak plików z TODO. Nic do zrobienia.")
+    print("Nie znaleziono plików z TODO.")
     exit(0)
 
-print("Detected main branch:", git_current_branch())
-print("Creating branch:", BRANCH)
+print("Znalezione pliki z TODO:")
+for f in FILES:
+    print(f" - {f.relative_to(ROOT)}")
 
-# przełącz się na master i pull
+# ---------- GIT ----------
 sh("git fetch origin master")
 sh("git checkout master")
 sh("git pull origin master")
 sh(f"git checkout -B {BRANCH}")
 
+# ---------- GENEROWANIE POPRAWEK PRZEZ COPILOT ----------
 for file_path in FILES:
-    print(f"🧹 Processing {file_path}")
+    rel_path = file_path.relative_to(ROOT)
+    print(f"🧹 Processing {rel_path}")
 
-    # Tworzymy tymczasowy plik z promptem dla Copilot
-    with tempfile.NamedTemporaryFile(mode="w+", delete=False) as tmp_prompt_file:
-        tmp_prompt_file.write(
-            f"""
+    # Przygotowanie promptu
+    file_content = file_path.read_text(encoding="utf-8")
+    prompt = f"""
 You are a senior Android developer.
 
 TASK:
@@ -59,39 +63,30 @@ TASK:
 - If TODO cannot be safely resolved, return the file unchanged
 
 FILE:
-{Path(file_path).read_text()}
+{file_content}
 """
-        )
-        tmp_prompt_path = tmp_prompt_file.name
+    # Użycie shlex.quote do zabezpieczenia cudzysłowów i spacji
+    safe_prompt = shlex.quote(prompt)
 
-    # Tymczasowy plik na wyjście Copilot
-    tmp_output = tempfile.NamedTemporaryFile(delete=False).name
+    # Plik tymczasowy na wynik
+    with tempfile.NamedTemporaryFile("w+", delete=False) as out_file:
+        tmp_output = out_file.name
 
-    # Wywołanie Copilot w trybie interaktywnym, zapis do pliku
-    with open(tmp_output, "w") as out_file:
-        subprocess.run(
-            ["copilot", "-i", tmp_prompt_path, "--non-interactive"],
-            stdout=out_file,
-            check=True
-        )
+    # Wywołanie Copilot CLI z -p
+    sh(f"copilot -p {safe_prompt} > {tmp_output}")
 
-    # Nadpisanie pliku wynikiem
-    new_content = Path(tmp_output).read_text()
-    Path(file_path).write_text(new_content)
-    print(f"✅ Updated {file_path}")
+    # Nadpisanie pliku wygenerowanym kodem
+    out_text = Path(tmp_output).read_text(encoding="utf-8")
+    file_path.write_text(out_text, encoding="utf-8")
 
-# commit + push
-sh("git add " + " ".join(FILES))
+# ---------- COMMIT & PUSH ----------
+sh("git add .")
 sh(f"git commit -m 'chore(ai): cleanup TODOs'")
 sh(f"git push origin {BRANCH}")
 
-# utworzenie PR
-sh(f"""
-gh pr create \
---title "AI: TODO cleanup" \
---body "Safe, minimal automated cleanup" \
---base master \
---head {BRANCH}
-""")
+# ---------- CREATE PR ----------
+pr_title = "AI: TODO cleanup"
+pr_body = "Safe, minimal automated cleanup"
+sh(f'gh pr create --title {shlex.quote(pr_title)} --body {shlex.quote(pr_body)} --base master --head {BRANCH}')
 
-print("🎉 Done. PR created.")
+print("✅ Done! PR created.")
