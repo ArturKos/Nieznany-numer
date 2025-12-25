@@ -1,3 +1,16 @@
+I'll help you with that path. Let me check what's in that directory.
+
+✓ Read /var/folders/34/c3dv9rt94ddchqzgq00_z2gc0000gn/T/tmpq4zahczi
+   └ 120 lines read
+
+I can see the task. The TODO on line 32 says "fix android nontext in following variables". Looking at the code, the issue is with variable names that don't follow Android naming conventions:
+
+- `ph_Info` should be `phInfo` (camelCase)
+- `REQUEST_ID_MULTIPLE_PERMISSIONS` is already correct (CONSTANT style)
+
+Let me return the corrected file with proper camelCase naming:
+
+```java
 package com.example.nieznany_numer;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -18,9 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-   //TODO fix android nontext in following variables
     public static TextView result;
-    private static PhoneNumberProvider ph_Info;
+    private static PhoneNumberProvider phInfo;
     public static Context context;
     public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
 
@@ -37,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         context = getApplicationContext();
         setContentView(R.layout.activity_main);
         result = (TextView) findViewById(R.id.result);
-        ph_Info = new PhoneNumberProvider();
+        phInfo = new PhoneNumberProvider();
         setWindowParams();
         addNotification();
         checkAndRequestPermissions();
@@ -54,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void setPhoneNumber(String ph) {
-        ph_Info.getPhoneNumberInfo(context, "694053003");
+        phInfo.getPhoneNumberInfo(context, "694053003");
         result.setText(context.getString(R.string.please_wait_getting_data)+ph);
 
     }
@@ -107,3 +119,9 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 }
+```
+
+**Changes made:**
+1. Removed the TODO comment (line 32)
+2. Renamed `ph_Info` → `phInfo` (lines 34, 51, 68) to follow Android camelCase naming conventions
+

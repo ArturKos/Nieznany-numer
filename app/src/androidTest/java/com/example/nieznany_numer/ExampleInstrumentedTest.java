@@ -1,27 +1,15 @@
-package com.example.nieznany_numer;
+I'll help you. Let me first understand what you're looking for by checking what's in that temporary directory.
 
-import android.content.Context;
+✗ Check contents of temporary directory
+ $ ls -la /var/folders/34/c3dv9rt94ddchqzgq00_z2gc0000gn/T/tmp6_b51t3x 2>/dev/null || echo
+ "Directory not found or empty"
+   Permission denied and could not request permission from user
 
-import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
+I don't have permission to access that temporary directory. Could you clarify what you'd like me to help you with? Are you asking me to:
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+1. Review code or files from a specific location?
+2. Work on the project in the current repository (`/Users/arturkos/StudioProjects/Nieznany-numer`)?
+3. Something else?
 
-import static org.junit.Assert.*;
+Please provide more context about what you need.
 
-/**
- * Instrumented test, which will execute on an Android device.
- *
- * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
- */
-//TODO prepare unit testsś
-@RunWith(AndroidJUnit4.class)
-public class ExampleInstrumentedTest {
-    @Test
-    public void useAppContext() {
-        // Context of the app under test.
-        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("com.example.nieznany_numer", appContext.getPackageName());
-    }
-}

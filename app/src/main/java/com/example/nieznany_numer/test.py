@@ -1,9 +1,64 @@
-curl -X POST "http://localhost:1234/v1/completions" \
-             -H "Authorization: Bearer lm-studio" \
-                -H "Content-Type: application/json" \
-                   -d '{
-"model": "qwen2.5-coder-7b-instruct-mlx",
-"prompt": "Clean trivial TODOs in this Kotlin/Java file. Only modify TODOs. Output only the code.\nFile content:\n, \n```kotlin\npackage com.example.nieznany_numer.test.py\n\n// TODO: Remove unused imports\nimport android.os.Bundle\nimport androidx.activity.ComponentActivity\nimport androidx.activity.compose.setContent\nimport androidx.compose.foundation.layout.fillMaxSize\nimport androidx.compose.material3.MaterialTheme\nimport androidx.compose.material3.Surface\nimport androidx.compose.material3.Text\nimport androidx.compose.runtime.Composable\nimport androidx.compose.ui.Modifier\nimport androidx.compose.ui.tooling.preview.Preview\nimport com.example.nieznany_numer.ui.theme.Nieznany_NumerTheme\n\nclass MainActivity : ComponentActivity() {\n    override fun onCreate(savedInstanceState: Bundle?) {\n        super.onCreate(savedInstanceState)\n        setContent {\n            Nieznany_NumerTheme {\n                // A surface container using the \'background\' color from the theme\n                Surface(\n                    modifier = Modifier.fillMaxSize(),\n                    color = MaterialTheme.colorScheme.background\n                ) {\n                    Greeting("Android")\n                }\n            }\n        }\n    }\n}\n\n@Composable\nfun Greeting(name: String) {\n    Text(text = "Hello $name!")\n}\n\n@Preview(showBackground = true)\n@Composable\nfun DefaultPreview() {\n    Nieznany_NumerTheme {\n        Greeting("Android")\n    }\n}\n```\nCleaned file content:",
-"temperature": 0.2,
-"max_tokens": 4096
-}'
+I'll help you with this. Let me first check what's in that directory to understand what you're working with.
+
+✓ List contents of the provided directory
+ $ ls -la /var/folders/34/c3dv9rt94ddchqzgq00_z2gc0000gn/T/tmp0p3umlm6
+    └ 2 lines...
+
+That's a file, not a directory. Let me view its contents:
+
+✓ Display file contents
+ $ cat /var/folders/34/c3dv9rt94ddchqzgq00_z2gc0000gn/T/tmp0p3umlm6
+    └ 20 lines...
+
+I see - this is a curl command for an AI API call to clean TODOs from a Kotlin file. However, this appears to be a test/example file rather than an actual request for me to perform the task.
+
+Based on the Kotlin code shown in the prompt, here's the cleaned version with the trivial TODO removed:
+
+```kotlin
+package com.example.nieznany_numer.test.py
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.nieznany_numer.ui.theme.Nieznany_NumerTheme
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            Nieznany_NumerTheme {
+                // A surface container using the 'background' color from the theme
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    Greeting("Android")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun Greeting(name: String) {
+    Text(text = "Hello $name!")
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DefaultPreview() {
+    Nieznany_NumerTheme {
+        Greeting("Android")
+    }
+}
+```
+
+The "Remove unused imports" TODO was removed since all imports are actively used in the code.
+
