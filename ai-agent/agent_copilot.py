@@ -3,6 +3,7 @@ import subprocess
 from pathlib import Path
 from datetime import date
 import tempfile
+import re
 
 # ---------------- CONFIG ----------------
 EXCLUDE_DIRS = {"venv", "ai-agent", ".git", "build", "out", "__pycache__"}
@@ -41,6 +42,13 @@ def find_todo_files(root: Path):
                 continue
     return todo_files
 
+def extract_code_from_copilot(text: str) -> str:
+    """Wyciąga tylko kod z odpowiedzi Copilot"""
+    code_blocks = re.findall(r"```(?:\w+)?\n(.*?)```", text, re.DOTALL)
+    if code_blocks:
+        return "\n".join(code_blocks)
+    return text.strip()  # fallback, jeśli nie ma ``` bloków
+
 # ---------------- MAIN ----------------
 if __name__ == "__main__":
     BASE_DIR = Path(__file__).parent.parent.resolve()
@@ -75,14 +83,15 @@ if __name__ == "__main__":
 
         # Zamiana pliku oryginalnego wygenerowanym przez Copilot
         try:
-            content = Path(tmp_output_path).read_text(encoding="utf-8")
+            raw_output = Path(tmp_output_path).read_text(encoding="utf-8")
+            content = extract_code_from_copilot(raw_output)
             fpath.write_text(content, encoding="utf-8")
         except Exception as e:
             print(f"Błąd przy zapisie pliku {fpath}: {e}")
 
     # 5️⃣ Commit i push
     sh("git add .")
-    sh(f'git commit -m "chore(ai): cleanup TODOs"')
+    sh('git commit -m "chore(ai): cleanup TODOs"')
     sh(f"git push origin {BRANCH}")
 
     # 6️⃣ Stworzenie PR na GitHub (gh musi być skonfigurowane)
