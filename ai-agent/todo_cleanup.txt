@@ -1,0 +1,5 @@
+Task: clean up simple TODOs in code.
+Rules:
+- Only trivial TODOs
+- No architecture changes
+- No behavior changes
