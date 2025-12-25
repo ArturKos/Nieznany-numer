@@ -1,110 +1,54 @@
 #!/usr/bin/env python3
-
-from pathlib import Path
 import subprocess
-import datetime
-import sys
 import tempfile
-import difflib
+from pathlib import Path
+from datetime import date
 
-# =========================
-# CONFIG
-# =========================
+# --- pomocnicze funkcje ---
+def sh(cmd, **kwargs):
+    """Uruchamia polecenie w shellu i wyrzuca wyjątek przy błędzie."""
+    subprocess.run(cmd, shell=True, check=True, **kwargs)
 
-ROOT = Path("app/src")
-ALLOWED_SUFFIXES = (".java", ".kt")
-MAX_FILE_SIZE = 50_000          # bytes
-MIN_OUTPUT_RATIO = 0.7          # output must be >= 70% of input
-BRANCH_PREFIX = "ai/todo-cleanup"
-BASE_BRANCH = "master"
-DRY_RUN = False                 # set True to disable writes/commits
-ONLY_AI_TODO = False            # True => only TODO(ai)
-
-# =========================
-# UTILS
-# =========================
-
-def sh(cmd: str):
-    print(f"> {cmd}")
-    subprocess.run(cmd, shell=True, check=True)
-
-def git_clean():
+def git_current_branch():
     result = subprocess.run(
-        "git status --porcelain",
-        shell=True,
-        capture_output=True,
-        text=True,
+        ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+        capture_output=True, text=True, check=True
     )
-    if result.stdout.strip():
-        print("❌ Working tree not clean. Commit or stash first.")
-        sys.exit(1)
+    return result.stdout.strip()
 
-def detect_main_branch():
-    for name in ("master", "main"):
-        try:
-            subprocess.run(
-                f"git show-ref --verify --quiet refs/heads/{name}",
-                shell=True,
-                check=True,
-            )
-            return name
-        except subprocess.CalledProcessError:
-            pass
-    print("❌ Cannot detect main branch")
-    sys.exit(1)
+def get_todo_files():
+    """Zwraca listę plików, które zawierają TODO."""
+    result = subprocess.run(
+        ["git", "grep", "-l", "TODO"],
+        capture_output=True, text=True
+    )
+    files = result.stdout.strip().splitlines()
+    return [f for f in files if Path(f).is_file()]
 
-# =========================
-# GIT SETUP
-# =========================
+# --- główna logika ---
+BRANCH = f"ai/todo-cleanup/{date.today().isoformat()}"
+FILES = get_todo_files()
 
-git_clean()
+if not FILES:
+    print("Brak plików z TODO. Nic do zrobienia.")
+    exit(0)
 
-BASE_BRANCH = detect_main_branch()
-print(f"Detected main branch: {BASE_BRANCH}")
+print("Detected main branch:", git_current_branch())
+print("Creating branch:", BRANCH)
 
-branch_name = f"{BRANCH_PREFIX}/{datetime.date.today()}"
-print(f"Creating branch: {branch_name}")
+# przełącz się na master i pull
+sh("git fetch origin master")
+sh("git checkout master")
+sh("git pull origin master")
+sh(f"git checkout -B {BRANCH}")
 
-sh(f"git fetch origin {BASE_BRANCH}")
-sh(f"git checkout {BASE_BRANCH}")
-sh(f"git pull origin {BASE_BRANCH}")
-sh(f"git checkout -B {branch_name}")
+for file_path in FILES:
+    print(f"🧹 Processing {file_path}")
 
-# =========================
-# FILE DISCOVERY
-# =========================
-
-files = [
-    p for p in ROOT.rglob("*")
-    if p.suffix in ALLOWED_SUFFIXES
-       and "build" not in p.parts
-       and "generated" not in p.parts
-       and p.is_file()
-       and p.stat().st_size < MAX_FILE_SIZE
-]
-
-if not files:
-    print("No candidate files found.")
-    sys.exit(0)
-
-# =========================
-# PROCESS FILES
-# =========================
-
-changed_files = []
-
-for file in files:
-    code = file.read_text(encoding="utf-8", errors="ignore")
-
-    if "TODO" not in code:
-        continue
-
-    if ONLY_AI_TODO and "TODO(ai)" not in code:
-        continue
-
-    print(f"🧹 Processing {file}")
-
-    prompt = f"""
+    # Tworzymy tymczasowy plik z promptem dla Copilot
+    with tempfile.NamedTemporaryFile(mode="w+", delete=False) as tmp_prompt_file:
+        tmp_prompt_file.write(
+            f"""
 You are a senior Android developer.
 
 TASK:
@@ -115,69 +59,39 @@ TASK:
 - If TODO cannot be safely resolved, return the file unchanged
 
 FILE:
-{code}
+{Path(file_path).read_text()}
 """
+        )
+        tmp_prompt_path = tmp_prompt_file.name
 
-    with tempfile.NamedTemporaryFile(delete=False) as tmp:
-        tmp_path = tmp.name
+    # Tymczasowy plik na wyjście Copilot
+    tmp_output = tempfile.NamedTemporaryFile(delete=False).name
 
-    sh(f'copilot -p "{prompt}" > {tmp_path}')
+    # Wywołanie Copilot w trybie interaktywnym, zapis do pliku
+    with open(tmp_output, "w") as out_file:
+        subprocess.run(
+            ["copilot", "-i", tmp_prompt_path, "--non-interactive"],
+            stdout=out_file,
+            check=True
+        )
 
-    out = Path(tmp_path).read_text(encoding="utf-8", errors="ignore").strip()
+    # Nadpisanie pliku wynikiem
+    new_content = Path(tmp_output).read_text()
+    Path(file_path).write_text(new_content)
+    print(f"✅ Updated {file_path}")
 
-    # =========================
-    # SAFETY CHECKS
-    # =========================
+# commit + push
+sh("git add " + " ".join(FILES))
+sh(f"git commit -m 'chore(ai): cleanup TODOs'")
+sh(f"git push origin {BRANCH}")
 
-    if len(out) < len(code) * MIN_OUTPUT_RATIO:
-        print("⚠️ Output too short – skipping")
-        continue
+# utworzenie PR
+sh(f"""
+gh pr create \
+--title "AI: TODO cleanup" \
+--body "Safe, minimal automated cleanup" \
+--base master \
+--head {BRANCH}
+""")
 
-    if "class " not in out and "interface " not in out:
-        print("⚠️ No class/interface detected – skipping")
-        continue
-
-    if out.strip() == code.strip():
-        print("⏭️ No effective change")
-        continue
-
-    # =========================
-    # DIFF (optional visibility)
-    # =========================
-
-    diff = difflib.unified_diff(
-        code.splitlines(),
-        out.splitlines(),
-        fromfile=str(file),
-        tofile=str(file),
-        lineterm=""
-    )
-
-    print("\n".join(list(diff)[:40]))
-
-    if DRY_RUN:
-        print("🧪 DRY RUN – not writing file")
-        continue
-
-    file.write_text(out, encoding="utf-8")
-    changed_files.append(file)
-    print(f"✅ Updated {file}")
-
-# =========================
-# COMMIT & PUSH
-# =========================
-
-if not changed_files:
-    print("Nothing changed. Exiting.")
-    sys.exit(0)
-
-if DRY_RUN:
-    print("🧪 DRY RUN – skipping commit/push")
-    sys.exit(0)
-
-sh("git add .")
-sh("git commit -m 'chore(ai): cleanup trivial TODOs'")
-sh(f"git push -u origin {branch_name}")
-
-print("\n🎉 AI cleanup completed successfully.")
-print(f"➡️ Open PR from {branch_name} into {BASE_BRANCH}")
+print("🎉 Done. PR created.")
