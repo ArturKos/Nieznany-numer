@@ -5,7 +5,7 @@ from datetime import date
 import tempfile
 
 # ---------------- CONFIG ----------------
-EXCLUDE_DIRS = {"venv", ".git", "build", "out", "__pycache__"}
+EXCLUDE_DIRS = {"venv", "ai-agent", ".git", "build", "out", "__pycache__"}
 FILE_EXTENSIONS = {".java", ".kt", ".py"}  # rozszerzenia plików, które sprawdzamy
 BRANCH_PREFIX = "ai/todo-cleanup"
 PROMPT_HEADER = """
