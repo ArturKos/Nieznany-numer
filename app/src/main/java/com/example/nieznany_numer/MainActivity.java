@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
+   //TODO fix android nontext in following variables
     public static TextView result;
     private static PhoneNumberProvider ph_Info;
     public static Context context;
@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void setPhoneNumber(String ph) {
-        ph_Info.getPhoneNumberInfo(context, "694053003"); // TODO do zmiany numer
+        ph_Info.getPhoneNumberInfo(context, "694053003");
         result.setText(context.getString(R.string.please_wait_getting_data)+ph);
 
     }
