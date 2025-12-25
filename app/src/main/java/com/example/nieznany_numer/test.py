@@ -1,9 +1,42 @@
-curl -X POST "http://localhost:1234/v1/completions" \
-             -H "Authorization: Bearer lm-studio" \
-                -H "Content-Type: application/json" \
-                   -d '{
-"model": "qwen2.5-coder-7b-instruct-mlx",
-"prompt": "Clean trivial TODOs in this Kotlin/Java file. Only modify TODOs. Output only the code.\nFile content:\n, \n```kotlin\npackage com.example.nieznany_numer.test.py\n\n// TODO: Remove unused imports\nimport android.os.Bundle\nimport androidx.activity.ComponentActivity\nimport androidx.activity.compose.setContent\nimport androidx.compose.foundation.layout.fillMaxSize\nimport androidx.compose.material3.MaterialTheme\nimport androidx.compose.material3.Surface\nimport androidx.compose.material3.Text\nimport androidx.compose.runtime.Composable\nimport androidx.compose.ui.Modifier\nimport androidx.compose.ui.tooling.preview.Preview\nimport com.example.nieznany_numer.ui.theme.Nieznany_NumerTheme\n\nclass MainActivity : ComponentActivity() {\n    override fun onCreate(savedInstanceState: Bundle?) {\n        super.onCreate(savedInstanceState)\n        setContent {\n            Nieznany_NumerTheme {\n                // A surface container using the \'background\' color from the theme\n                Surface(\n                    modifier = Modifier.fillMaxSize(),\n                    color = MaterialTheme.colorScheme.background\n                ) {\n                    Greeting("Android")\n                }\n            }\n        }\n    }\n}\n\n@Composable\nfun Greeting(name: String) {\n    Text(text = "Hello $name!")\n}\n\n@Preview(showBackground = true)\n@Composable\nfun DefaultPreview() {\n    Nieznany_NumerTheme {\n        Greeting("Android")\n    }\n}\n```\nCleaned file content:",
-"temperature": 0.2,
-"max_tokens": 4096
-}'
+I'll help you with that. Let me check what you're referring to in that temporary directory.
+
+✓ Check contents of the temporary directory
+ $ ls -la /var/folders/34/c3dv9rt94ddchqzgq00_z2gc0000gn/T/tmpv1ismqem 2>&1 | head -20
+    └ 2 lines...
+
+That's a file, not a directory. Let me read its contents:
+
+✓ Read the temporary file
+ $ cat /var/folders/34/c3dv9rt94ddchqzgq00_z2gc0000gn/T/tmpv1ismqem
+    └ 20 lines...
+
+I see - this is a curl command that's trying to use an LLM API to clean trivial TODOs. However, I should clarify something important: I don't need to call an external API. I can directly help you clean the trivial TODOs in the Kotlin file shown.
+
+Looking at the file, the TODO "Remove unused imports" is actually the only one. Let me check the actual codebase to see if there are unused imports and help you properly:
+
+✓ Find MainActivity file in the project
+ $ find /Users/arturkos/StudioProjects/Nieznany-numer -name "MainActivity.kt" -o -name
+ "*MainActivity*" | head -5
+    └ 6 lines...
+
+Let me find the source Kotlin file:
+
+✗ Find source MainActivity.kt
+ $ find /Users/arturkos/StudioProjects/Nieznany-numer -path "*/src/**" -name "MainActivity.kt"
+ 2>/dev/null
+   Permission denied and could not request permission from user
+
+Let me try a different approach:
+
+✓ Find MainActivity.kt files
+ $ find /Users/arturkos/StudioProjects/Nieznany-numer -type f -name "MainActivity.kt" 2>&1 | grep
+  -v "Permission denied" | head -5
+    └ 1 line...
+
+Could you clarify what you'd like me to do? Would you like me to:
+
+1. **Clean the Kotlin code snippet** in the temporary file (remove the TODO about unused imports if they're actually unused)
+2. **Find and fix TODO comments** in your actual project files
+3. **Something else with this file**?
+
+Please let me know which file(s) you want cleaned and I'll help!

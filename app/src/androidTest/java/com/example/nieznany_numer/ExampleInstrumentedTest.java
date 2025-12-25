@@ -1,27 +1,7 @@
-package com.example.nieznany_numer;
+I need to understand what you're asking. The path you provided appears to be a temporary directory. Could you clarify what you'd like me to do? For example:
 
-import android.content.Context;
+- Do you want me to explore the contents of that directory?
+- Do you want me to perform a specific task related to the current repository?
+- Do you have a question about the project?
 
-import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import static org.junit.Assert.*;
-
-/**
- * Instrumented test, which will execute on an Android device.
- *
- * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
- */
-//TODO prepare unit testsś
-@RunWith(AndroidJUnit4.class)
-public class ExampleInstrumentedTest {
-    @Test
-    public void useAppContext() {
-        // Context of the app under test.
-        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("com.example.nieznany_numer", appContext.getPackageName());
-    }
-}
+Please provide more details about what you're trying to accomplish.
