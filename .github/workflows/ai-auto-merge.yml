@@ -1,0 +1,21 @@
+name: AI Auto Merge
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    if: startsWith(github.head_ref, 'ai/')
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run tests
+        run: ./gradlew assembleDebug
+
+      - name: Enable auto-merge
+        uses: peter-evans/enable-pull-request-automerge@v3
+        with:
+          merge-method: squash
+

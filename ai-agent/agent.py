@@ -1,51 +1,41 @@
-import subprocess
-import datetime
+import requests
 
-TASK = "todo-cleanup"
-BRANCH = f"ai/{TASK}/{datetime.date.today()}"
+file_path = "app/src/main/java/com/example/nieznany_numer/MainActivity.java"
 
-def sh(cmd):
-    print(">", cmd)
-    subprocess.run(cmd, shell=True, check=True)
+# Wczytaj plik
+with open(file_path, "r", encoding="utf-8") as f:
+    content = f.read()
 
-# 1. aktualny main
-sh("git checkout master")
-sh("git pull origin master")
+# Usuń wszystkie dziwne znaczniki przed wysłaniem
+for token in ["<|im_start|>", "<|im_end|>", "|>"]:
+    content = content.replace(token, "")
 
-# 2. branch
-sh(f"git checkout -b {BRANCH}")
+# Przygotuj prompt
+prompt = f"""
+Clean trivial TODOs in this Kotlin/Java file.
+Follow rules from ai-agent/rules.md.
+Only modify TODOs, do not change other code.
+Output only the updated code, without explanations, markers, or tokens.
+File content:
+{content}
+"""
 
-# 3. 🔴 TU NA RAZIE RĘCZNIE
-print("""
-=== AGENT PAUSE ===
-👉 Teraz:
-- użyj Continue / LM Studio
-- wykonaj zadanie: TODO cleanup
-- zapisz pliki
-===================
-""")
-input("Press ENTER when ready...")
+# Wywołanie LM Studio
+response = requests.post(
+    "http://localhost:1234/v1/completions",
+    headers={"Authorization": "Bearer lm-studio"},
+    json={
+        "model": "qwen2.5-coder-7b-instruct-mlx",
+        "prompt": prompt,
+        "temperature": 0.2,
+        "max_tokens": 4096
+    },
+    timeout=300
+)
 
-# 4. sprawdź czy coś się zmieniło
-status = subprocess.check_output("git status --porcelain", shell=True).decode()
-if not status.strip():
-    print("No changes detected. Aborting.")
-    sh("git checkout master")
-    sh(f"git branch -D {BRANCH}")
-    exit(0)
+data = response.json()
+text = data.get("choices", [{}])[0].get("text", "")
 
-# 5. commit
-sh("git add .")
-sh("git commit -m 'chore(ai): cleanup TODOs'")
-sh(f"git push origin {BRANCH}")
-
-# 6. PR (bez merge!)
-sh(f"""
-gh pr create \
-  --title "AI: TODO cleanup" \
-  --body "Safe, minimal automated cleanup" \
-  --base master \
-  --head {BRANCH}
-""")
-
-print("✅ PR created. Review it manually.")
+print("=== AI OUTPUT START ===")
+print(text if text.strip() else "⚠️ EMPTY OUTPUT")
+print("=== AI OUTPUT END ===")

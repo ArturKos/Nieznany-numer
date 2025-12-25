@@ -40,7 +40,7 @@ public class PhoneNumberProvider {
                     builder.append(context.getString(R.string.error_geting_pn_info)).append(e.getMessage()).append("\n");
                 }
                 switch(ocena)
-                {
+                { //TODO change stings to english
                     case "Negatywna": MainActivity.result.setTextColor(Color.RED); break;
                     case "Neutralna": MainActivity.result.setTextColor(Color.GREEN); break;
                 }
