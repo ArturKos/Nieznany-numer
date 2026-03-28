@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}{{ data.phone_number }} - Nieznany Numer{% endblock %}
+
+{% block content %}
+<section class="search-section compact">
+    <form action="/" method="get" id="search-form">
+        <div class="search-box">
+            <input type="tel" id="phone-input" name="q"
+                   placeholder="Szukaj innego numeru..."
+                   pattern="[\d\s\-\+\(\)]{7,20}"
+                   required>
+            <button type="submit">Szukaj</button>
+        </div>
+    </form>
+</section>
+
+<section class="number-detail">
+    <h1 class="phone-number">{{ data.phone_number }}</h1>
+
+    <div class="rating-badge rating-{{ data.rating }}">
+        {% if data.rating == 'negative' %}
+            Negatywna
+        {% elif data.rating == 'positive' %}
+            Pozytywna
+        {% elif data.rating == 'neutral' %}
+            Neutralna
+        {% else %}
+            Brak ocen
+        {% endif %}
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat">
+            <span class="stat-value negative">{{ data.rating_counts.negative }}</span>
+            <span class="stat-label">Negatywna</span>
+        </div>
+        <div class="stat">
+            <span class="stat-value neutral">{{ data.rating_counts.neutral }}</span>
+            <span class="stat-label">Neutralna</span>
+        </div>
+        <div class="stat">
+            <span class="stat-value positive">{{ data.rating_counts.positive }}</span>
+            <span class="stat-label">Pozytywna</span>
+        </div>
+        <div class="stat">
+            <span class="stat-value">{{ data.search_count }}</span>
+            <span class="stat-label">Wyszukiwan</span>
+        </div>
+        <div class="stat">
+            <span class="stat-value">{{ data.comment_count }}</span>
+            <span class="stat-label">Komentarzy</span>
+        </div>
+    </div>
+</section>
+
+<section class="rate-section">
+    <h2>Oceń ten numer</h2>
+    <div class="rating-buttons">
+        <button class="btn-rate btn-negative" onclick="submitRating('negative')">Negatywna</button>
+        <button class="btn-rate btn-neutral" onclick="submitRating('neutral')">Neutralna</button>
+        <button class="btn-rate btn-positive" onclick="submitRating('positive')">Pozytywna</button>
+    </div>
+</section>
+
+<section class="comment-section">
+    <h2>Dodaj komentarz</h2>
+    <form id="comment-form">
+        <textarea id="comment-text" placeholder="Opisz swoje doswiadczenie z tym numerem..."
+                  maxlength="1000" rows="3" required></textarea>
+        <button type="submit">Wyslij komentarz</button>
+    </form>
+</section>
+
+{% if data.comments %}
+<section class="comments-list">
+    <h2>Komentarze ({{ data.comment_count }})</h2>
+    {% for comment in data.comments %}
+    <div class="comment">
+        <p class="comment-text">{{ comment.text }}</p>
+        <span class="comment-date">{{ comment.created_at[:10] }}</span>
+    </div>
+    {% endfor %}
+</section>
+{% endif %}
+
+<div id="toast" class="toast hidden"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const phoneNumber = "{{ data.phone_number }}";
+
+function getDeviceId() {
+    let id = localStorage.getItem('device_id');
+    if (!id) {
+        id = 'web-' + crypto.randomUUID();
+        localStorage.setItem('device_id', id);
+    }
+    return id;
+}
+
+function showToast(msg, ok) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast ' + (ok ? 'toast-ok' : 'toast-err');
+    setTimeout(() => t.className = 'toast hidden', 3000);
+}
+
+async function submitRating(rating) {
+    try {
+        const res = await fetch('/api/v1/numbers/' + phoneNumber + '/ratings', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'X-Device-Id': getDeviceId()},
+            body: JSON.stringify({rating})
+        });
+        if (res.ok) {
+            showToast('Ocena zapisana!', true);
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showToast('Blad: ' + (await res.json()).detail, false);
+        }
+    } catch (e) {
+        showToast('Blad polaczenia', false);
+    }
+}
+
+document.getElementById('comment-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const text = document.getElementById('comment-text').value.trim();
+    if (text.length < 3) return;
+    try {
+        const res = await fetch('/api/v1/numbers/' + phoneNumber + '/comments', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'X-Device-Id': getDeviceId()},
+            body: JSON.stringify({text})
+        });
+        if (res.ok) {
+            showToast('Komentarz dodany!', true);
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showToast('Blad: ' + (await res.json()).detail, false);
+        }
+    } catch (e) {
+        showToast('Blad polaczenia', false);
+    }
+});
+
+document.getElementById('search-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const phone = document.getElementById('phone-input').value.replace(/[\s\-\(\)]/g, '');
+    if (phone.length >= 7) window.location.href = '/numer/' + encodeURIComponent(phone);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/overlay_root"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/overlay_background"
+    android:padding="16dp"
+    android:elevation="8dp"
+    android:minWidth="280dp"
+    android:maxWidth="320dp">
+
+    <!-- Header with close button -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp">
+
+        <TextView
+            android:id="@+id/overlay_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:text="@string/app_name"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/overlay_close"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_alignParentEnd="true"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/overlay_close"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:scaleType="centerInside"
+            android:tint="#999999" />
+    </RelativeLayout>
+
+    <!-- Phone number -->
+    <TextView
+        android:id="@+id/overlay_phone_number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="4dp" />
+
+    <!-- Rating badge -->
+    <TextView
+        android:id="@+id/overlay_rating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:textColor="#FFFFFF"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Info text (searches, comments, etc.) -->
+    <TextView
+        android:id="@+id/overlay_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#CCCCCC"
+        android:textSize="12sp"
+        android:lineSpacingExtra="2dp"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Loading indicator -->
+    <TextView
+        android:id="@+id/overlay_loading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/please_wait_getting_data"
+        android:textColor="#999999"
+        android:textSize="12sp"
+        android:layout_marginBottom="8dp"
+        android:visibility="visible" />
+
+    <!-- Reject call button (shown only for negative ratings) -->
+    <Button
+        android:id="@+id/overlay_reject_btn"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="@string/overlay_reject_call"
+        android:textColor="#FFFFFF"
+        android:textSize="13sp"
+        android:textAllCaps="false"
+        android:background="@drawable/btn_reject_background"
+        android:visibility="gone" />
+
+</LinearLayout>
