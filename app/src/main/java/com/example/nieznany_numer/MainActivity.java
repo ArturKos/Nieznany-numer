@@ -1,109 +1,116 @@
 package com.example.nieznany_numer;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.view.WindowManager;
+import android.provider.Settings;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-   //TODO fix android nontext in following variables
-    public static TextView result;
-    private static PhoneNumberProvider ph_Info;
-    public static Context context;
-    public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-    }
+    private static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
+    private static final int REQUEST_OVERLAY_PERMISSION = 2;
+    private static final String CHANNEL_ID = "nieznany_numer_channel";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        context = getApplicationContext();
         setContentView(R.layout.activity_main);
-        result = (TextView) findViewById(R.id.result);
-        ph_Info = new PhoneNumberProvider();
-        setWindowParams();
+
+        TextView result = findViewById(R.id.result);
+        result.setText(R.string.hello_user);
+
+        createNotificationChannel();
         addNotification();
         checkAndRequestPermissions();
+        requestOverlayPermission();
     }
 
-    public void setWindowParams() {
-        WindowManager.LayoutParams wlp = getWindow().getAttributes();
-        wlp.dimAmount = 0;
-        wlp.flags = WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS |
-                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL |
-                WindowManager.LayoutParams.FLAG_FULLSCREEN |
-                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
-        getWindow().setAttributes(wlp);
+    private void requestOverlayPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+            Intent intent = new Intent(
+                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:" + getPackageName()));
+            startActivityForResult(intent, REQUEST_OVERLAY_PERMISSION);
+        }
     }
 
-    public static void setPhoneNumber(String ph) {
-        ph_Info.getPhoneNumberInfo(context, "694053003");
-        result.setText(context.getString(R.string.please_wait_getting_data)+ph);
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_OVERLAY_PERMISSION) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+                Toast.makeText(this, R.string.overlay_permission_needed, Toast.LENGTH_LONG).show();
+            }
+        }
+    }
 
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    CHANNEL_ID,
+                    getString(R.string.app_name),
+                    NotificationManager.IMPORTANCE_LOW);
+            channel.setDescription("Phone number lookup notifications");
+            NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            manager.createNotificationChannel(channel);
+        }
     }
-    public static void setTextViewText(String text) {
-        result.setText(text);
-    }
+
     private void addNotification() {
         NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(context)
+                new NotificationCompat.Builder(this, CHANNEL_ID)
                         .setSmallIcon(R.drawable.ic_launcher_background)
-                        .setContentTitle("Notifications Example")
-                        .setContentText("This is a test notification");
+                        .setContentTitle(getString(R.string.app_name))
+                        .setContentText(getString(R.string.hello_user))
+                        .setOngoing(true);
 
-        Intent notificationIntent = new Intent(this, MainActivity.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+        android.app.PendingIntent contentIntent = android.app.PendingIntent.getActivity(
+                this, 0, new Intent(this, MainActivity.class),
+                android.app.PendingIntent.FLAG_UPDATE_CURRENT | android.app.PendingIntent.FLAG_IMMUTABLE);
         builder.setContentIntent(contentIntent);
 
-        // Add as notification
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         manager.notify(0, builder.build());
     }
 
+    private void checkAndRequestPermissions() {
+        List<String> permissionsNeeded = new ArrayList<>();
 
-    private  boolean checkAndRequestPermissions() {
-        int phone_state_permission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
-        int internet_access_permission = ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET);
-        int system_alert_window_permission = ContextCompat.checkSelfPermission(this, Manifest.permission.SYSTEM_ALERT_WINDOW);
-        int read_call_log_permission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG);
-        List<String> listPermissionsNeeded = new ArrayList<>();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
+                != PackageManager.PERMISSION_GRANTED) {
+            permissionsNeeded.add(Manifest.permission.READ_PHONE_STATE);
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG)
+                != PackageManager.PERMISSION_GRANTED) {
+            permissionsNeeded.add(Manifest.permission.READ_CALL_LOG);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ANSWER_PHONE_CALLS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                permissionsNeeded.add(Manifest.permission.ANSWER_PHONE_CALLS);
+            }
+        }
 
-        if (phone_state_permission != PackageManager.PERMISSION_GRANTED) {
-            listPermissionsNeeded.add(android.Manifest.permission.READ_PHONE_STATE);
+        if (!permissionsNeeded.isEmpty()) {
+            ActivityCompat.requestPermissions(this,
+                    permissionsNeeded.toArray(new String[0]),
+                    REQUEST_ID_MULTIPLE_PERMISSIONS);
         }
-        if (internet_access_permission != PackageManager.PERMISSION_GRANTED) {
-            listPermissionsNeeded.add(android.Manifest.permission.INTERNET);
-        }
-        if (read_call_log_permission != PackageManager.PERMISSION_GRANTED) {
-            listPermissionsNeeded.add(android.Manifest.permission.READ_CALL_LOG);
-        }
-        if (system_alert_window_permission != PackageManager.PERMISSION_GRANTED) {
-            listPermissionsNeeded.add(android.Manifest.permission.SYSTEM_ALERT_WINDOW);
-        }
-        if (!listPermissionsNeeded.isEmpty())
-        {
-            ActivityCompat.requestPermissions(this,listPermissionsNeeded.toArray
-                    (new String[listPermissionsNeeded.size()]),REQUEST_ID_MULTIPLE_PERMISSIONS);
-            return false;
-        }
-        return true;
     }
 }

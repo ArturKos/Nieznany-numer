@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Nieznany Numer - Sprawdz kto dzwoni{% endblock %}
+
+{% block content %}
+<section class="search-section">
+    <h1>Kto dzwonil?</h1>
+    <p>Wpisz numer telefonu, aby sprawdzic opinie innych uzytkownikow</p>
+    <form action="/" method="get" id="search-form">
+        <div class="search-box">
+            <input type="tel" id="phone-input" name="q"
+                   placeholder="np. 694053003"
+                   pattern="[\d\s\-\+\(\)]{7,20}"
+                   required>
+            <button type="submit">Szukaj</button>
+        </div>
+    </form>
+</section>
+
+<section class="info-section">
+    <div class="info-card">
+        <h3>Nieznany numer?</h3>
+        <p>Sprawdz czy inni uzytkownicy oznaczyli ten numer jako spam lub oszustwo.</p>
+    </div>
+    <div class="info-card">
+        <h3>Pomoz innym</h3>
+        <p>Dodaj ocene i komentarz, aby ostrzec innych przed niechcianymi polaczeniami.</p>
+    </div>
+    <div class="info-card">
+        <h3>Baza danych</h3>
+        <p>Spolecznosc buduje baze numerow telefonow z ocenami i komentarzami.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('search-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const phone = document.getElementById('phone-input').value.replace(/[\s\-\(\)]/g, '');
+    if (phone.length >= 7) {
+        window.location.href = '/numer/' + encodeURIComponent(phone);
+    }
+});
+</script>
+{% endblock %}

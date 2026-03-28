@@ -8,4 +8,12 @@
     <string name="telephone_last_checked">Недавно проверено:\u0020</string>
     <string name="please_wait_getting_data">Пожалуйста, подождите, я загружаю данные о номере:\u0020</string>
     <string name="error_geting_pn_info">Ошибка при попытке получить информацию о номере:\u0020</string>
+    <string name="telephone_user_comments">Комментарии пользователей:</string>
+    <string name="overlay_close">Закрыть</string>
+    <string name="overlay_reject_call">Отклонить вызов</string>
+    <string name="overlay_permission_needed">Требуется разрешение на отображение поверх других приложений</string>
+    <string name="rating_negative">Негативная</string>
+    <string name="rating_positive">Позитивная</string>
+    <string name="rating_neutral">Нейтральная</string>
+    <string name="rating_unknown">Нет оценок</string>
 </resources>

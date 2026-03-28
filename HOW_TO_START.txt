@@ -1,0 +1,94 @@
+Nieznany Numer - How to Start
+==============================
+
+PREREQUISITES
+-------------
+- Python 3.10+
+- Java 17 (for Android build)
+- Android SDK (platform 36, build-tools 36.0.0)
+- Docker (optional, for containerized deployment)
+
+
+1. BACKEND (local development)
+------------------------------
+cd backend
+pip install -r requirements.txt
+uvicorn main:app --host 0.0.0.0 --port 8000
+
+The API will be available at:
+  - Web UI:        http://localhost:8000/
+  - Number lookup: http://localhost:8000/numer/{phone_number}
+  - API endpoint:  http://localhost:8000/api/v1/numbers/{phone_number}
+  - API docs:      http://localhost:8000/docs
+
+SQLite database (phonedata.db) is created automatically on first run.
+
+
+2. BACKEND (Docker deployment)
+------------------------------
+cd backend
+docker build -t nieznany-numer-backend .
+docker run -d --name nieznany-numer \
+  -p 8000:8000 \
+  -v nieznany_numer_db:/app/data \
+  -e DB_PATH=/app/data/phonedata.db \
+  --restart unless-stopped \
+  nieznany-numer-backend
+
+If you have docker compose plugin installed, you can also use:
+  docker compose up -d --build
+
+The database is persisted in a Docker volume (nieznany_numer_db).
+For production, put a reverse proxy (Caddy or nginx) in front for HTTPS.
+
+Useful commands:
+  docker logs nieznany-numer          - view logs
+  docker restart nieznany-numer       - restart
+  docker stop nieznany-numer          - stop
+  docker rm -f nieznany-numer         - remove container
+
+
+3. API ENDPOINTS
+----------------
+GET  /api/v1/numbers/{phone_number}           - Lookup phone number
+POST /api/v1/numbers/{phone_number}/ratings    - Submit rating (requires X-Device-Id header)
+     Body: {"rating": "negative" | "neutral" | "positive"}
+
+POST /api/v1/numbers/{phone_number}/comments   - Submit comment (requires X-Device-Id header)
+     Body: {"text": "comment text"}
+
+GET  /api/v1/numbers/{phone_number}/comments   - Get paginated comments (?page=1&limit=20)
+
+
+4. ANDROID APP
+--------------
+Before building, update the API URL in:
+  app/src/main/java/com/example/nieznany_numer/PhoneNumberProvider.java
+  Line 20: Change API_BASE to your actual server URL.
+
+Build the app:
+  export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+  ./gradlew assembleDebug
+
+The APK will be at:
+  app/build/outputs/apk/debug/app-debug.apk
+
+
+5. PROJECT STRUCTURE
+--------------------
+backend/
+  main.py              - FastAPI app (API endpoints + web pages)
+  database.py          - SQLite database layer (3 tables: phone_numbers, ratings, comments)
+  models.py            - Request validation models
+  templates/           - Jinja2 HTML templates (home page + number detail page)
+  static/style.css     - Dark theme, responsive CSS
+  Dockerfile           - Production container image
+  docker-compose.yml   - One-command deployment
+  requirements.txt     - Python dependencies
+
+app/                   - Android application (Java, minSdk 21, targetSdk 36)
+  src/main/java/com/example/nieznany_numer/
+    MainActivity.java         - Main activity, permissions, notifications
+    PhoneNumberProvider.java  - Fetches phone info from backend API
+    PhoneStateReceiver.java   - BroadcastReceiver for incoming calls
+    Notification.java         - Notification detail activity

@@ -8,4 +8,12 @@
     <string name="telephone_last_checked">Ostatnio sprawdzany:\u0020</string>
     <string name="please_wait_getting_data">Proszę czekać, pobieram dane o numerze:\u0020</string>
     <string name="error_geting_pn_info">Błąd przy próbie pobierania informacji o numerze:\u0020</string>
+    <string name="telephone_user_comments">Komentarze użytkowników:</string>
+    <string name="overlay_close">Zamknij</string>
+    <string name="overlay_reject_call">Odrzuć połączenie</string>
+    <string name="overlay_permission_needed">Wymagane uprawnienie do wyświetlania nad innymi aplikacjami</string>
+    <string name="rating_negative">Negatywna</string>
+    <string name="rating_positive">Pozytywna</string>
+    <string name="rating_neutral">Neutralna</string>
+    <string name="rating_unknown">Brak ocen</string>
 </resources>
